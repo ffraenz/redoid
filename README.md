@@ -7,68 +7,82 @@ Dioder.js
 
 Creates a dioder object. You don't need to provide any options, these are the defaults.
 
-    var Dioder = require('dioder');
-    var Color = require('color');
+```javascript
+var Dioder = require('dioder');
+var Color = require('color');
 
-    var dioder = Dioder({
-        color: Color('#ffffff'),
-        easing: function(t, b, c, d) { ... },
-        colorComponentPins: [4, 17, 18],
-        animationInterval: 25
-    });
+var dioder = Dioder({
+    color: Color('#ffffff'),
+    easing: function(t, b, c, d) { ... },
+    colorComponentPins: [4, 17, 18],
+    animationInterval: 25
+});
+```
 
 ### changeTo
 
 Changes the color without transition. Fires the callback when completed.
 
-    changeTo(color, [callback]);
+```javascript
+changeTo(color, [callback]);
+```
 
 ### animateTo
 
 Animates from the current color to the specified one in a given duration and easing. Fires the callback when completed.
 
-    animateTo(color, transitionDuration, [callback], [easing]);
+```javascript
+animateTo(color, transitionDuration, [callback], [easing]);
+```
 
 ### delay
 
 Delays the next queued animations by a given duration.
 
-    delay(duration);
+```javascript
+delay(duration);
+```
 
 ### stop
 
 Interrupts the current transition and clears the queue. In this case, no callbacks are called.
 
-    stop();
+```javascript
+stop();
+```
 
 ## Examples
 
 ### Simple Notification
 
-    dioder
-        .stop()
-        .animateTo(Color('#249db3'), 250)
-        .animateTo(Color('#ffffff'), 4000);
+```javascript
+dioder
+    .stop()
+    .animateTo(Color('#249db3'), 250)
+    .animateTo(Color('#ffffff'), 4000);
+```
 
 ### Red Alert
 
-    function animateToRed()
-    {
-        dioder.animateTo(Color('#ff0000'), 1500, animateToBlack);
-    }
+```javascript
+function animateToRed()
+{
+    dioder.animateTo(Color('#ff0000'), 1500, animateToBlack);
+}
 
-    function animateToBlack()
-    {
-        dioder.animateTo(Color('#300000'), 1500, animateToRed);
-    }
+function animateToBlack()
+{
+    dioder.animateTo(Color('#300000'), 1500, animateToRed);
+}
 
-    // start animation
-    animateToBlack();
+// start animation
+animateToBlack();
 
-    // stop animation after 30 seconds
-    setTimeout(function() {
-        dioder.stop();
-    }, 30000);
+// stop animation after 30 seconds
+setTimeout(function() {
+    dioder.stop();
+}, 30000);
+```
 
 
 ## License
