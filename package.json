@@ -1,0 +1,20 @@
+{
+	"name": "dioder",
+	"description": "",
+	"version": "0.0.1",
+	"author": "Fränz Friederes <fraenz@frieder.es>",
+	"repository": {
+		"type": "git",
+		"url": "http://github.com/ffraenz/dioder.git"
+	},
+	"main": "./dioder.js",
+	"dependencies": {
+		"pi-blaster.js": ">=0.0.2",
+		"color": ">=0.7.1"
+	},
+	"homepage": "https://github.com/ffraenz/dioder",
+	"bugs": {
+		"url": "https://github.com/ffraenz/dioder/issues"
+	},
+	"keywords": ["raspberry", "pi", "ikea", "dioder", "lights"]
+}
