@@ -1,5 +1,5 @@
-Dioder.js
-=========
+dioder
+======
 
 ## Usage
 
