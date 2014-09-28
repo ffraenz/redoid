@@ -1,6 +1,19 @@
 dioder
 ======
 
+A node package that gives your Raspberry Pi control over your IKEA DIODER LED light strip.
+
+## Install
+
+Make sure you have `node` and `npm` installed on your Raspberry Pi.
+
+Install the [pi-blaster daemon](https://github.com/sarfata/pi-blaster).
+
+Finally install `dioder`:
+
+    npm install dioder
+
+
 ## Usage
 
 ### Constructor
@@ -21,7 +34,7 @@ var dioder = Dioder({
 
 ### changeTo
 
-Changes the color without transition. Fires the callback when completed.
+Changes the color without transition. Calls the callback when completed.
 
 ```javascript
 changeTo(color, [callback]);
@@ -29,7 +42,7 @@ changeTo(color, [callback]);
 
 ### animateTo
 
-Animates from the current color to the specified one in a given duration and easing. Fires the callback when completed.
+Animates from the current color to a specified one in a given duration and easing. Calls the callback when completed.
 
 ```javascript
 animateTo(color, transitionDuration, [callback], [easing]);
@@ -45,7 +58,7 @@ delay(duration);
 
 ### stop
 
-Interrupts the current transition and clears the queue. In this case, no callbacks are called.
+Interrupts the current transition and clears the queue. In this case, no callbacks (sent to `changeTo` or `animateTo`) are called.
 
 ```javascript
 stop();
@@ -65,13 +78,11 @@ dioder
 ### Red Alert
 
 ```javascript
-function animateToRed()
-{
+function animateToRed() {
     dioder.animateTo(Color('#ff0000'), 1500, animateToBlack);
 }
 
-function animateToBlack()
-{
+function animateToBlack() {
     dioder.animateTo(Color('#300000'), 1500, animateToRed);
 }
 
