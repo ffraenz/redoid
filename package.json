@@ -1,7 +1,7 @@
 {
 	"name": "dioder",
 	"description": "A node package that gives your Raspberry Pi control over your IKEA DIODER LED light strip.",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"author": "Fränz Friederes <fraenz@frieder.es>",
 	"repository": {
 		"type": "git",
@@ -16,5 +16,5 @@
 	"bugs": {
 		"url": "https://github.com/ffraenz/dioder/issues"
 	},
-	"keywords": ["raspberry", "pi", "ikea", "dioder", "lights"]
+	"keywords": ["raspberry", "pi", "ikea", "dioder", "lights", "animation"]
 }
