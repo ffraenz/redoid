@@ -3,13 +3,11 @@ dioder
 
 A node package that gives your Raspberry Pi control over your Ikea Dioder LED light strip.
 
-## Install
+## Installation
 
-Connect your Dioder LED light strip to your Raspberry Pi ([instructions](http://krizzblog.de/2013/12/the-pidioder/)).
-
-Install the pi-blaster daemon ([instructions](https://github.com/sarfata/pi-blaster)).
-
-Make sure you have `node` and `npm` installed on your Raspberry Pi.
+- Connect your Dioder LED light strip to your Raspberry Pi ([instructions](http://krizzblog.de/2013/12/the-pidioder/)).
+- Install the pi-blaster daemon ([instructions](https://github.com/sarfata/pi-blaster)).
+- Make sure you have `node` and `npm` installed on your Raspberry Pi.
 
 Finally install `dioder`:
 
