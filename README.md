@@ -52,8 +52,6 @@ var color = Color().rgb([255, 255, 255]);
 
 Easing values are expected to be a `function` or one of the following keys: `linear`, `easeInQuad`, `easeOutQuad`, `easeInOutQuad`, `easeInCubic`, `easeOutCubic`, `easeInOutCubic`, `easeInQuart`, `easeOutQuart`, `easeInOutQuart`, `easeInQuint`, `easeOutQuint`, `easeInOutQuint`.
 
-Easing expressed by a function:
-
 ```javascript
 // expressed by a function
 var easing = function(t) {
@@ -117,7 +115,7 @@ dioder.stop();
 
 #### setLoopQueue
 
-If set to `true` completed animations will be readded to the end of the animation queue.
+If set to `true` completed animations will be readded to the end of the animation queue resulting in a never-ending animation loop.
 
 ```javascript
 dioder.setLoopQueue(loopQueue);
