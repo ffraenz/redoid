@@ -4,7 +4,6 @@
 	'use strict';
 
 	var piblaster = require('pi-blaster.js');
-	var Color = require('color');
 
 	var EASING_FUNCTIONS = {
 		linear: function(t) { return t },
@@ -44,7 +43,7 @@
 		this._idleTimeout = null;
 
 		// options
-		var color = options.color || Color('#000000');
+		var color = this._interpretColor(options.color || '#000000');
 		this._defaultEasing = options.defaultEasing || 'easeInOutQuad';
 		this._colorComponentPins = options.colorComponentPins || [4, 17, 18];
 		this._animationLoopTickDuration = options.animationInterval || 25;
@@ -103,7 +102,7 @@
 				{
 					// reset and requeue this entry
 					currentEntry.time = 0;
-					currentEntry.from = this.getLastQueuedColor();
+					currentEntry.from = this.getLastQueuedColorComponents();
 					this._animationQueue.push(currentEntry);
 				}
 
@@ -122,9 +121,7 @@
 		{
 			// we are inside an animation step
 			// calculate intermediate color
-			var fromColorComponents = currentEntry.from.rgbArray();
-			var intermediateColorComponents = [0, 0, 0];
-			var toColorComponents = currentEntry.to.rgbArray();
+			var intermediateColor = [0, 0, 0];
 
 			// ease time
 			var easedTime = this._easeTime(
@@ -135,13 +132,10 @@
 			for (var i = 0; i < 3; i ++)
 			{
 				// calculate intermediate component value
-				intermediateColorComponents[i] =
-					(1 - easedTime) * fromColorComponents[i]
-					+ easedTime * toColorComponents[i];
+				intermediateColor[i] =
+					(1 - easedTime) * currentEntry.from[i]
+					+ easedTime * currentEntry.to[i];
 			}
-
-			// compose color
-			var intermediateColor = Color().rgb(intermediateColorComponents);
 
 			// apply color
 			this._applyColor(intermediateColor);
@@ -199,18 +193,15 @@
 
 	Dioder._applyColor = function(color)
 	{
-		var colorComponents = color.rgbArray();
-		var currentColorComponents = this._color ? this._color.rgbArray() : null;
-
 		// go through components
 		for (var i = 0; i < 3; i ++)
 		{
 			if (
 				// check if this component has been changed
-				currentColorComponents === null
-				|| colorComponents[i] != currentColorComponents[i])
+				this._color === null
+				|| color[i] != this._color[i])
 			{
-				piblaster.setPwm(this._colorComponentPins[i], colorComponents[i] / 255.0);
+				piblaster.setPwm(this._colorComponentPins[i], color[i] / 255.0);
 			}
 		}
 
@@ -218,12 +209,69 @@
 		this._color = color;
 	};
 
-	Dioder.getColor = function()
+	Dioder._interpretColor = function(color)
+	{
+		if (typeof color === 'string')
+		{
+			// expect this to be the hex value of a color
+			return this._colorByHexValue(color);
+		}
+		else if (
+			Object.prototype.toString.call(color) === '[object Array]'
+			&& color.length == 3
+		) {
+			// expect this to be the rgb color components
+			// no conversion needed
+			return color;
+		}
+	};
+
+	//
+	// color conversion
+	//
+
+	Dioder._colorByHexValue = function(hexValue)
+	{
+		// expand shorthand (e.g. "#03F") to full form (e.g. "#0033FF")
+		var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+		hexValue = hexValue.replace(shorthandRegex, function(m, r, g, b) {
+			return r + r + g + g + b + b;
+		});
+
+		// retrieve components
+		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexValue);
+		return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
+	};
+
+	Dioder._hexValueByColor = function(color)
+	{
+		return '#'
+			+ this._hexValueByComponent(color[0])
+			+ this._hexValueByComponent(color[1])
+			+ this._hexValueByComponent(color[2]);
+	};
+
+	Dioder._hexValueByComponent = function(component)
+	{
+		var hexValue = component.toString(16);
+		return hexValue.length == 1 ? '0' + hexValue : hexValue;
+	};
+
+	//
+	// public interface
+	//
+
+	Dioder.getColorComponents = function()
 	{
 		return this._color;
 	};
 
-	Dioder.getLastQueuedColor = function()
+	Dioder.getColor = function()
+	{
+		return this._hexValueByColor(this.getColorComponents());
+	};
+
+	Dioder.getLastQueuedColorComponents = function()
 	{
 		var last = this._color;
 
@@ -236,25 +284,19 @@
 		return last;
 	};
 
-	Dioder.setLoopQueue = function(loopQueue)
+	Dioder.getLastQueuedColor = function()
 	{
-		this._loopAnimationQueue = loopQueue;
-		return this;
-	};
-
-	Dioder.isKnownEasing = function(easing)
-	{
-		return (EASING_FUNCTIONS[easing] !== undefined);
+		return this._hexValueByColor(this.getLastQueuedColorComponents());
 	};
 
 	Dioder.animateTo = function(color, duration, easing, callback)
 	{
-		var from = this.getLastQueuedColor();
+		var from = this.getLastQueuedColorComponents();
 
 		// queue animation step
 		this._animationQueue.push({
 			from: from,
-			to: color,
+			to: this._interpretColor(color),
 			time: 0,
 			duration: (duration !== undefined ? duration : 1000),
 			easing: easing || this._defaultEasing,
@@ -274,7 +316,7 @@
 	Dioder.delay = function(delay, callback)
 	{
 		// animate to the same color in delay
-		return this.animateTo(this.getLastQueuedColor(), delay, 'linear', callback);
+		return this.animateTo(this.getLastQueuedColorComponents(), delay, 'linear', callback);
 	};
 
 	Dioder.stop = function()
@@ -286,6 +328,17 @@
 		}
 
 		return this;
+	};
+
+	Dioder.setLoopQueue = function(loopQueue)
+	{
+		this._loopAnimationQueue = loopQueue;
+		return this;
+	};
+
+	Dioder.isKnownEasing = function(easing)
+	{
+		return (EASING_FUNCTIONS[easing] !== undefined);
 	};
 
 })();

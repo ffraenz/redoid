@@ -22,10 +22,9 @@ Creates a dioder object. You don't need to provide any options, these are the de
 
 ```javascript
 var Dioder = require('dioder');
-var Color = require('color');
 
 var dioder = Dioder({
-    color: Color('#ffffff'),
+    color: '#ffffff',
     defaultEasing: 'easeInOutQuad',
     colorComponentPins: [4, 17, 18],
     animationInterval: 25,
@@ -36,13 +35,17 @@ var dioder = Dioder({
 
 ### Color
 
-Color values are expected to be created by the [harthur/color](https://github.com/harthur/color) library. Only RGB values (no alpha) are supported.
+Color values are expected to be rgb hexadecimal strings or arrays of rgb color components.
 
 ```javascript
-var color = Color('#ffffff');
-var color = Color('rgb(255, 255, 255)');
-var color = Color().rgb(255, 255, 255);
-var color = Color().rgb([255, 255, 255]);
+// hexadecimal
+var color = '#ff0000';
+
+// shorthand hexadecimal
+var color = '#f00';
+
+// array of color components
+var color = [255, 0, 0];
 ```
 
 
@@ -65,10 +68,18 @@ var easing = 'easeInOutQuad';
 
 #### getColor
 
-Returns the current color.
+Returns the current color. (e.g. `#ff0000`)
 
 ```javascript
 dioder.getColor();
+```
+
+#### getColorComponents
+
+Returns the components of the current color. (e.g. `[255, 0, 0]`)
+
+```javascript
+dioder.getColorComponents();
 ```
 
 #### getLastQueuedColor
@@ -77,6 +88,14 @@ Returns the ending color of the animation queue. If `loopQueue` is set to `true`
 
 ```javascript
 dioder.getLastQueuedColor();
+```
+
+#### getLastQueuedColorComponents
+
+Returns the components of the last queued color.
+
+```javascript
+dioder.getLastQueuedColorComponents();
 ```
 
 #### changeTo
@@ -124,30 +143,33 @@ dioder.setLoopQueue(loopQueue);
 ### Simple Notification
 
 ```javascript
+var dioder = require('dioder')({
+    color: '#ffffff'
+});
+
 dioder
-    .stop()
-    .animateTo(Color('#249db3'), 250)
-    .animateTo(Color('#ffffff'), 4000);
+    .animateTo('#249db3', 250)
+    .animateTo('#ffffff', 4000);
 ```
 
 ### Red Alert
 
 ```javascript
+var dioder = require('dioder')({
+    color: '#300000'
+});
+
 dioder
-    .stop()
     .setLoopQueue(true)
-    .animateTo(Color('#ff0000'), 1500)
-    .animateTo(Color('#300000'), 1500);
+    .animateTo('#ff0000', 1500)
+    .animateTo('#300000', 1500);
 ```
 
 ### Easing
 
 ```javascript
-var firstColor = Color('#ffffff');
-var secondColor = Color('#ff0000');
-
-var dioder = Dioder({
-    color: firstColor
+var dioder = require('dioder')({
+    color: '#ffffff'
 });
 
 var easingFunctions = [
@@ -163,10 +185,12 @@ for (var i = 0; i < easingFunctions.length; i ++)
     var easing = easingFunctions[i];
 
     // wait for 1 second and log the easing method used
-    dioder.delay(1000, function() { console.log('' + this); }.bind(easing));
+    dioder.delay(1000, function() {
+        console.log('' + this);
+    }.bind(easing));
     
     // animate to the other color using easing
-    dioder.animateTo((i % 2 !== 0 ? firstColor : secondColor), 2000, easing);
+    dioder.animateTo((i % 2 !== 0 ? '#ffffff' : '#ff0000'), 2000, easing);
 }
 ```
 
