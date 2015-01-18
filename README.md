@@ -162,7 +162,7 @@ for (var i = 0; i < easingFunctions.length; i ++)
 {
     var easing = easingFunctions[i];
 
-    // wait for 1 second and log the easing method
+    // wait for 1 second and log the easing method used
     dioder.delay(1000, function() { console.log('' + this); }.bind(easing));
     
     // animate to the other color using easing

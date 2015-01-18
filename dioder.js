@@ -24,36 +24,31 @@
 
 	module.exports = function(options)
 	{
-		return new Dioder(options);
+		return new DioderStatic(options);
 	};
 
-	var Dioder = (function(options)
-	{
-		// attributes
-		this._color = null;
-		this._defaultEasing = null;
-		this._colorComponentPins = null;
-
-		this._animationQueue = [];
-		this._animationLoopInterval = null;
-		this._animationLoopTickDuration = null;
-		this._loopAnimationQueue = false;
-
-		this._idleCallback = null;
-
-		// init
-		this.init(options);
+	var DioderStatic = (function(options) {
+		this._init.apply(this, arguments);
 	});
 
-	Dioder.prototype.init = function(options)
+	var Dioder = DioderStatic.prototype;
+
+	Dioder._init = function(options)
 	{
 		options = options || {};
 
-		// read options
+		// attributes
+		this._color = null;
+		this._animationQueue = [];
+		this._animationLoopInterval = null;
+		this._idleTimeout = null;
+
+		// options
 		var color = options.color || Color('#000000');
 		this._defaultEasing = options.defaultEasing || 'easeInOutQuad';
 		this._colorComponentPins = options.colorComponentPins || [4, 17, 18];
 		this._animationLoopTickDuration = options.animationInterval || 25;
+		this._durationUntilIdle = options.durationUntilIdle || 0;
 		this._idleCallback = options.idleCallback || null;
 		this._loopAnimationQueue = options.loopQueue || false;
 
@@ -61,60 +56,21 @@
 		this._applyColor(color);
 	};
 
-	Dioder.prototype.animateTo = function(color, duration, easing, callback)
+	Dioder._startAnimationLoop = function()
 	{
-		var from = this.getLastQueuedColor();
-
-		// queue animation step
-		this._animationQueue.push({
-			from: from,
-			to: color,
-			time: 0,
-			duration: (duration !== undefined ? duration : 1000),
-			easing: easing || this._defaultEasing,
-			callback: callback || null
-		});
-
 		if (this._animationLoopInterval === null)
 		{
 			// turn on animation loop
 			this._animationLoopInterval = setInterval(
 				this._animationLoop.bind(this),
 				this._animationLoopTickDuration);
+
+			// cancel idle timeout
+			clearTimeout(this._idleTimeout);
 		}
-
-		return this;
 	};
 
-	Dioder.prototype.changeTo = function(color, callback)
-	{
-		return this.animateTo(color, 0, 'linear', callback);
-	};
-
-	Dioder.prototype.delay = function(delay, callback)
-	{
-		// animate to the same color in delay
-		return this.animateTo(this.getLastQueuedColor(), delay, 'linear', callback);
-	};
-
-	Dioder.prototype.stop = function()
-	{
-		if (this._animationQueue.length > 0)
-		{
-			// remove all queued entries
-			this._animationQueue = [];
-		}
-
-		return this;
-	};
-
-	Dioder.prototype.setLoopQueue = function(loopQueue)
-	{
-		this._loopAnimationQueue = loopQueue;
-		return this;
-	};
-
-	Dioder.prototype._animationLoop = function()
+	Dioder._animationLoop = function()
 	{
 		var time = this._animationLoopTickDuration;
 
@@ -151,8 +107,8 @@
 					this._animationQueue.push(currentEntry);
 				}
 
-				// apply the entry's end color if it is the last one
-				if (this._animationQueue.length === 1)
+				// apply the entry's end color if it was the last one
+				if (this._animationQueue.length === 0)
 				{
 					this._applyColor(currentEntry.to);
 				}
@@ -196,15 +152,35 @@
 			clearInterval(this._animationLoopInterval);
 			this._animationLoopInterval = null;
 
-			// the queue comes to an end
-			if (this._idleCallback !== null)
-			{
-				this._idleCallback(this);
-			}
+			// animation completed
+			this._animationCompleted();
 		}
 	};
 
-	Dioder.prototype._easeTime = function(time, easing)
+	Dioder._animationCompleted = function()
+	{
+		if (this._durationUntilIdle > 0)
+		{
+			this._idleTimeout = setTimeout(
+				this._onIdle.bind(this),
+				this._durationUntilIdle);
+		}
+		else
+		{
+			this._onIdle();
+		}
+	};
+
+	Dioder._onIdle = function()
+	{
+		// the queue comes to an end
+		if (this._idleCallback !== null)
+		{
+			this._idleCallback(this);
+		}
+	};
+
+	Dioder._easeTime = function(time, easing)
 	{
 		if (typeof easing === 'function')
 		{
@@ -219,27 +195,9 @@
 
 		// use default easing
 		return EASING_FUNCTIONS['easeInOutQuad'];
-	}
-
-	Dioder.prototype.getColor = function()
-	{
-		return this._color;
 	};
 
-	Dioder.prototype.getLastQueuedColor = function()
-	{
-		var last = this._color;
-
-		if (this._animationQueue.length > 0)
-		{
-			// take the color of the last stack entry
-			last = this._animationQueue[this._animationQueue.length - 1].to;
-		}
-
-		return last;
-	};
-
-	Dioder.prototype._applyColor = function(color)
+	Dioder._applyColor = function(color)
 	{
 		var colorComponents = color.rgbArray();
 		var currentColorComponents = this._color ? this._color.rgbArray() : null;
@@ -258,6 +216,76 @@
 
 		// keep track of the current color
 		this._color = color;
+	};
+
+	Dioder.getColor = function()
+	{
+		return this._color;
+	};
+
+	Dioder.getLastQueuedColor = function()
+	{
+		var last = this._color;
+
+		if (this._animationQueue.length > 0)
+		{
+			// take the color of the last stack entry
+			last = this._animationQueue[this._animationQueue.length - 1].to;
+		}
+
+		return last;
+	};
+
+	Dioder.setLoopQueue = function(loopQueue)
+	{
+		this._loopAnimationQueue = loopQueue;
+		return this;
+	};
+
+	Dioder.isKnownEasing = function(easing)
+	{
+		return (EASING_FUNCTIONS[easing] !== undefined);
+	};
+
+	Dioder.animateTo = function(color, duration, easing, callback)
+	{
+		var from = this.getLastQueuedColor();
+
+		// queue animation step
+		this._animationQueue.push({
+			from: from,
+			to: color,
+			time: 0,
+			duration: (duration !== undefined ? duration : 1000),
+			easing: easing || this._defaultEasing,
+			callback: callback || null
+		});
+
+		this._startAnimationLoop();
+
+		return this;
+	};
+
+	Dioder.changeTo = function(color, callback)
+	{
+		return this.animateTo(color, 0, 'linear', callback);
+	};
+
+	Dioder.delay = function(delay, callback)
+	{
+		// animate to the same color in delay
+		return this.animateTo(this.getLastQueuedColor(), delay, 'linear', callback);
+	};
+
+	Dioder.stop = function()
+	{
+		if (this._animationQueue.length > 0)
+		{
+			// remove all queued entries
+			this._animationQueue = [];
+		}
+
+		return this;
 	};
 
 })();
