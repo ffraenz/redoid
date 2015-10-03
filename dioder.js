@@ -341,4 +341,9 @@
 		return (EASING_FUNCTIONS[easing] !== undefined);
 	};
 
+	Dioder.turnOff = function(callback)
+	{
+		return this.animateTo('#000', 0, 'linear', callback);
+	};
+
 })();
