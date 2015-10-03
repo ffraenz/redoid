@@ -138,6 +138,14 @@ If set to `true` completed animations will be readded to the end of the animatio
 dioder.setLoopQueue(loopQueue);
 ```
 
+#### turnOff
+
+Turns off the LED-strips.
+
+```javascript
+dioder.turnOff(callback);
+```
+
 ## Examples
 
 ### Simple Notification
@@ -188,7 +196,7 @@ for (var i = 0; i < easingFunctions.length; i ++)
     dioder.delay(1000, function() {
         console.log('' + this);
     }.bind(easing));
-    
+
     // animate to the other color using easing
     dioder.animateTo((i % 2 !== 0 ? '#ffffff' : '#ff0000'), 2000, easing);
 }
