@@ -1,20 +1,25 @@
 {
-	"name": "dioder",
+	"name": "redoid",
 	"description": "A node package that gives your Raspberry Pi control over your Ikea Dioder LED light strip.",
-	"version": "0.0.5",
+	"version": "0.1.0",
 	"author": "Fränz Friederes <fraenz@frieder.es>",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "http://github.com/ffraenz/dioder.git"
+		"url": "http://github.com/ffraenz/redoid.git"
 	},
-	"main": "./dioder.js",
 	"dependencies": {
-		"pi-blaster.js": ">=0.0.2"
+		"pi-blaster.js": "~0.1.2"
 	},
-	"homepage": "https://github.com/ffraenz/dioder",
+	"homepage": "https://github.com/ffraenz/redoid",
 	"bugs": {
-		"url": "https://github.com/ffraenz/dioder/issues"
+		"url": "https://github.com/ffraenz/redoid/issues"
 	},
-	"keywords": ["raspberry", "pi", "ikea", "dioder", "lights", "animation"]
+	"keywords": [
+		"raspberry pi",
+		"ikea",
+		"dioder",
+		"LED",
+		"transition"
+	]
 }

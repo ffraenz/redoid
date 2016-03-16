@@ -1,35 +1,85 @@
-dioder
+redoid
 ======
 
-A node package that gives your Raspberry Pi control over your Ikea Dioder LED light strip.
+A node.js package that gives your Raspberry Pi control over your Ikea Dioder LED light strip.
 
 ## Installation
 
-- Connect your Dioder LED light strip to your Raspberry Pi ([instructions](http://krizzblog.de/2013/12/the-pidioder/)).
+- Connect your Dioder LED light strip to your Raspberry Pi.
 - Install the pi-blaster daemon ([instructions](https://github.com/sarfata/pi-blaster)).
 - Make sure you have `node` and `npm` installed on your Raspberry Pi.
 
-Finally install `dioder`:
+Finally install `redoid`:
 
-    $ npm install dioder
+    $ npm install redoid
 
+
+## Examples
+
+### Simple Alert
+
+```javascript
+var Redoid = require('redoid');
+var redoid = Redoid({
+    color: '#ffffff'
+});
+
+redoid.transition('#249db3', 250);
+redoid.transition('#ffffff', 4000);
+```
+
+### Red Alert
+
+```javascript
+var Redoid = require('redoid');
+var redoid = Redoid({
+    color: '#300000',
+    loopTransition: true
+});
+
+redoid.transition('#ff0000', 1500);
+redoid.transition('#300000', 1500);
+```
+
+### Easing
+
+```javascript
+var Redoid = require('redoid');
+var redoid = Redoid({
+    color: '#ffffff'
+});
+
+var i = 0;
+
+for (var easing in Redoid.easingFunctions)
+{
+    // trigger method logging the used easing function
+    redoid.trigger(function() {
+        console.log('' + this);
+    }.bind(easing));
+
+    redoid.delay(1000);
+    redoid.transition(i ++ % 2 === 0 ? '#ff0000' : '#ffffff', 2000, easing);
+}
+```
 
 ## Usage
 
 ### Instance
 
-Creates a dioder object. You don't need to provide any options, these are the defaults.
+You don't need to provide any options. These are the defaults.
 
 ```javascript
-var Dioder = require('dioder');
+var Redoid = require('redoid');
 
-var dioder = Dioder({
+var redoid = Redoid({
     color: '#ffffff',
-    defaultEasing: 'easeInOutQuad',
     colorComponentPins: [4, 17, 18],
-    animationInterval: 25,
+    loopInterval: 25,
+    defaultEasing: 'easeInOutQuad',
     idleCallback: null,
-    loopQueue: false
+    idleTimeout: 0,
+    loopTransition: false
 });
 ```
 
@@ -56,7 +106,7 @@ Easing values are expected to be a `function` or one of the following keys: `lin
 ```javascript
 // expressed by a function
 var easing = function(t) {
-    return t<.5 ? 2*t*t : -1+(4-2*t)*t
+    return t<.5 ? 2*t*t : -1+(4-2*t)*t;
 }
 
 // expressed by a key
@@ -68,146 +118,97 @@ var easing = 'easeInOutQuad';
 
 #### getColor
 
-Returns the current color. (e.g. `#ff0000`)
+Return the current color. (e.g. `[255, 0, 0]`)
 
 ```javascript
-dioder.getColor();
+redoid.getColor();
 ```
 
-#### getColorComponents
+#### getColorHexValue
 
-Returns the components of the current color. (e.g. `[255, 0, 0]`)
+Return hex value of current color. (e.g. `#ff0000`)
 
 ```javascript
-dioder.getColorComponents();
+redoid.getColorHexValue();
 ```
 
 #### getLastQueuedColor
 
-Returns the ending color of the animation queue. If `loopQueue` is set to `true`, this value changes during animation.
+Return the last queued color. If `loopTransition` is set to `true`, this value changes during transiton.
 
 ```javascript
-dioder.getLastQueuedColor();
+redoid.getLastQueuedColor();
 ```
 
-#### getLastQueuedColorComponents
+#### getLastQueuedColorHexValue
 
-Returns the components of the last queued color.
+Return hex value of last queued color.
 
 ```javascript
-dioder.getLastQueuedColorComponents();
+redoid.getLastQueuedColorHexValue();
 ```
 
-#### changeTo
+#### transition
 
-Changes the color without transition. Calls the callback when completed.
+Queue transition from the last queued color (obtained by `getLastQueuedColor`) to the color provided.
 
 ```javascript
-dioder.changeTo(color, [callback]);
+redoid.transition(color, [duration], [easing]);
 ```
 
-#### animateTo
+#### change
 
-Animates from the previous color (obtained by `getLastQueuedColor`) to a specified one in a given duration and easing. Calls the callback when completed.
-
-```javascript
-dioder.animateTo(color, [duration], [easing], [callback]);
-```
-
-#### delay
-
-Delays the next queued animations by a given duration. Calls the callback when completed.
+Queue color change to color provided.
 
 ```javascript
-dioder.delay(duration, [callback]);
-```
-
-#### stop
-
-Interrupts the current transition and clears the queue. In this case, no callbacks (sent to `changeTo`, `animateTo` or `delay`) are called.
-
-```javascript
-dioder.stop();
-```
-
-#### setLoopQueue
-
-If set to `true` completed animations will be readded to the end of the animation queue resulting in a never-ending animation loop.
-
-```javascript
-dioder.setLoopQueue(loopQueue);
+redoid.change(color);
 ```
 
 #### turnOff
 
-Turns off the LED-strips.
+Queue turning off the lights.
 
 ```javascript
-dioder.turnOff(callback);
+redoid.turnOff();
 ```
 
-## Examples
+#### delay
 
-### Simple Notification
+Delay next queue entry by given duration.
 
 ```javascript
-var dioder = require('dioder')({
-    color: '#ffffff'
-});
-
-dioder
-    .animateTo('#249db3', 250)
-    .animateTo('#ffffff', 4000);
+redoid.delay(duration);
 ```
 
-### Red Alert
+#### trigger
+
+Trigger callback when transition reaches this transition step.
 
 ```javascript
-var dioder = require('dioder')({
-    color: '#300000'
-});
-
-dioder
-    .setLoopQueue(true)
-    .animateTo('#ff0000', 1500)
-    .animateTo('#300000', 1500);
+redoid.trigger(callback);
 ```
 
-### Easing
+#### stop
+
+Interrupt the current transition and clear the queue. When firing this method, no callbacks set by `trigger` get called.
 
 ```javascript
-var dioder = require('dioder')({
-    color: '#ffffff'
-});
-
-var easingFunctions = [
-    'linear',
-    'easeInQuad', 'easeOutQuad', 'easeInOutQuad',
-    'easeInCubic', 'easeOutCubic', 'easeInOutCubic',
-    'easeInQuart', 'easeOutQuart', 'easeInOutQuart',
-    'easeInQuint', 'easeOutQuint', 'easeInOutQuint'
-];
-
-for (var i = 0; i < easingFunctions.length; i ++)
-{
-    var easing = easingFunctions[i];
-
-    // wait for 1 second and log the easing method used
-    dioder.delay(1000, function() {
-        console.log('' + this);
-    }.bind(easing));
-
-    // animate to the other color using easing
-    dioder.animateTo((i % 2 !== 0 ? '#ffffff' : '#ff0000'), 2000, easing);
-}
+redoid.stop();
 ```
 
+#### setLoopTransition
+
+If set to `true` completed transition steps will be added to the end of the queue resulting in a never-ending transition loop.
+
+```javascript
+redoid.setLoopTransition(loopTransition);
+```
 
 ## License
 
 The MIT License (MIT)
 
-Copyright (c) 2013 Fränz Friederes <[fraenz@frieder.es](mailto:fraenz@frieder.es)>
+Copyright (c) 2016 Fränz Friederes <[fraenz@frieder.es](mailto:fraenz@frieder.es)>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
