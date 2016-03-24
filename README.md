@@ -1,7 +1,7 @@
 redoid
 ======
 
-A Node.js package that gives your Raspberry Pi control over your IKEA Dioder LED light strip and provides an API to create transitions. Read *redoid* the other way round to understand where its name comes from.
+A Node.js package that provides an API to control your IKEA Dioder LED light strip on your Raspberry Pi. Read *redoid* the other way round to understand where its name comes from.
 
 ## Installation
 
