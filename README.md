@@ -77,11 +77,25 @@ var redoid = Redoid({
     colorComponentPins: [4, 17, 18],
     loopInterval: 25,
     defaultEasing: 'easeInOutQuad',
-    idleCallback: null,
     idleTimeout: 0,
+    idleCallback: null,
+    idleColor: null,
+    idleColorTransitionDuration: 4000,
     loopTransition: false
 });
 ```
+
+Option | Description
+------ | -----------
+`color` | Initial color
+`colorComponentPins` | Array having 3 integer values of the RGB GPIO pins dioder is connected to.
+`loopInterval` | Duration between transitioning ticks.
+`defaultEasing` | Default easing
+`idleTimeout` | Delay between idle state and the idle event.
+`idleCallback` | Function that gets called when the idle event is triggered.
+`idleColor` | Idle color to transition to when the idle event is triggered. This feature is disabled if set to `null`.
+`idleColorTransitionDuration` | Idle color transition duration
+`loopTransition` | If set to `true` completed transition steps will be added to the end of the queue resulting in a never-ending transition loop.
 
 ### Color
 
@@ -121,7 +135,7 @@ var easing = 'easeInOutQuad';
 Return the current color. (e.g. `[255, 0, 0]`)
 
 ```javascript
-redoid.getColor();
+var color = redoid.getColor();
 ```
 
 #### getColorHexValue
@@ -129,7 +143,7 @@ redoid.getColor();
 Return hex value of current color. (e.g. `#ff0000`)
 
 ```javascript
-redoid.getColorHexValue();
+var color = redoid.getColorHexValue();
 ```
 
 #### getLastQueuedColor
@@ -137,7 +151,7 @@ redoid.getColorHexValue();
 Return the last queued color. If `loopTransition` is set to `true`, this value changes during transiton.
 
 ```javascript
-redoid.getLastQueuedColor();
+var color = redoid.getLastQueuedColor();
 ```
 
 #### getLastQueuedColorHexValue
@@ -145,7 +159,23 @@ redoid.getLastQueuedColor();
 Return hex value of last queued color.
 
 ```javascript
-redoid.getLastQueuedColorHexValue();
+var color = redoid.getLastQueuedColorHexValue();
+```
+
+#### isColorEqual
+
+Check if colors are equal.
+
+```javascript
+var isColorEqual = redoid.isColorEqual(a, b)
+```
+
+#### isTransitioning
+
+Returns `true` when currently inside transition.
+
+```javascript
+var isTransitioning = redoid.isTransitioning();
 ```
 
 #### transition
@@ -169,7 +199,7 @@ redoid.change(color);
 Queue turning off the lights.
 
 ```javascript
-redoid.turnOff();
+redoid.turnOff([duration]);
 ```
 
 #### delay
@@ -198,10 +228,18 @@ redoid.stop();
 
 #### setLoopTransition
 
-If set to `true` completed transition steps will be added to the end of the queue resulting in a never-ending transition loop.
+Set the `loopTransition` option.
 
 ```javascript
 redoid.setLoopTransition(loopTransition);
+```
+
+#### setIdleColor
+
+Set the `idleColor` option.
+
+```javascript
+redoid.setIdleColor(idleColor);
 ```
 
 ## License
