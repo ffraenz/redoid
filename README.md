@@ -1,17 +1,29 @@
 redoid
 ======
 
-A node.js package that gives your Raspberry Pi control over your Ikea Dioder LED light strip.
+A Node.js package that gives your Raspberry Pi control over your IKEA Dioder LED light strip and provides an API to create transitions. Read *redoid* the other way round to understand where its name comes from.
 
 ## Installation
 
-- Connect your Dioder LED light strip to your Raspberry Pi.
-- Install the pi-blaster daemon ([instructions](https://github.com/sarfata/pi-blaster)).
-- Make sure you have `node` and `npm` installed on your Raspberry Pi.
+### Connect Dioder to Raspberry Pi
 
-Finally install `redoid`:
+Please notice that you need to change the circuit board of your Dioder control unit physically in order to connect it to the Raspberry Pi. After that you will not be able to use the buttons on the control unit to change the behavior of the LEDs.
 
-    $ npm install redoid
+![Dioder control unit circuit board](https://cloud.githubusercontent.com/assets/1041468/14026264/59c19de4-f1f2-11e5-82ae-3eb507588dcc.jpg)
+
+- Open the IKEA Dioder control unit carefully with a screwdriver.
+- Remove the micro controller `1` from the circuit board.
+- Solder 4 wires to `2`, `R`, `G` and `B`.
+- Connect `2` to a `GND` pin on the Raspberry Pi.
+- Connect `R`, `G` and `B` to GPIO pins (preferably `GPIO4`, `GPIO17` and `GPIO18`) on the Raspberry Pi.
+
+### Install Dependencies
+
+Install the pi-blaster daemon ([instructions](https://github.com/sarfata/pi-blaster)) and Node.js with npm.
+
+Finally install `redoid` using npm:
+
+    npm install redoid
 
 
 ## Examples
@@ -67,7 +79,19 @@ for (var easing in Redoid.easingFunctions)
 
 ### Instance
 
-You don't need to provide any options. These are the defaults.
+You can create one or more `Redoid` instances by calling its constructor. The constructor takes one optional associative array with following keys to configure the instance:
+
+- **color** – Initial color to apply when an instance gets created.
+- **colorComponentPins** – Array having 3 integer values of the RGB GPIO pins dioder is connected to.
+- **loopInterval** – Duration between transitioning ticks.
+- **defaultEasing** – Default easing
+- **idleTimeout** – Delay between idle state and the idle event.
+- **idleCallback** – Function that gets called when the idle event is triggered.
+- **idleColor** – Idle color to transition to when the idle event is triggered. This feature is disabled if set to `null`.
+- **idleColorTransitionDuration** – Idle color transition duration
+- **loopTransition** – If set to `true` completed transition steps will be added to the end of the queue resulting in a never-ending transition loop.
+
+The following instance gets configured with the default values:
 
 ```javascript
 var Redoid = require('redoid');
@@ -85,21 +109,9 @@ var redoid = Redoid({
 });
 ```
 
-Option | Description
------- | -----------
-`color` | Initial color
-`colorComponentPins` | Array having 3 integer values of the RGB GPIO pins dioder is connected to.
-`loopInterval` | Duration between transitioning ticks.
-`defaultEasing` | Default easing
-`idleTimeout` | Delay between idle state and the idle event.
-`idleCallback` | Function that gets called when the idle event is triggered.
-`idleColor` | Idle color to transition to when the idle event is triggered. This feature is disabled if set to `null`.
-`idleColorTransitionDuration` | Idle color transition duration
-`loopTransition` | If set to `true` completed transition steps will be added to the end of the queue resulting in a never-ending transition loop.
-
 ### Color
 
-Color values are expected to be rgb hexadecimal strings or arrays of rgb color components.
+Color values are expected to be rgb hexadecimal strings or arrays having 3 integer values representing the rgb color components.
 
 ```javascript
 // hexadecimal
@@ -108,7 +120,7 @@ var color = '#ff0000';
 // shorthand hexadecimal
 var color = '#f00';
 
-// array of color components
+// color components
 var color = [255, 0, 0];
 ```
 
@@ -118,65 +130,17 @@ var color = [255, 0, 0];
 Easing values are expected to be a `function` or one of the following keys: `linear`, `easeInQuad`, `easeOutQuad`, `easeInOutQuad`, `easeInCubic`, `easeOutCubic`, `easeInOutCubic`, `easeInQuart`, `easeOutQuart`, `easeInOutQuart`, `easeInQuint`, `easeOutQuint`, `easeInOutQuint`.
 
 ```javascript
-// expressed by a function
+// known easing function by name
+var easing = 'easeInOutQuad';
+
+// easing function
 var easing = function(t) {
     return t<.5 ? 2*t*t : -1+(4-2*t)*t;
 }
-
-// expressed by a key
-var easing = 'easeInOutQuad';
 ```
 
 
-### Methods
-
-#### getColor
-
-Return the current color. (e.g. `[255, 0, 0]`)
-
-```javascript
-var color = redoid.getColor();
-```
-
-#### getColorHexValue
-
-Return hex value of current color. (e.g. `#ff0000`)
-
-```javascript
-var color = redoid.getColorHexValue();
-```
-
-#### getLastQueuedColor
-
-Return the last queued color. If `loopTransition` is set to `true`, this value changes during transiton.
-
-```javascript
-var color = redoid.getLastQueuedColor();
-```
-
-#### getLastQueuedColorHexValue
-
-Return hex value of last queued color.
-
-```javascript
-var color = redoid.getLastQueuedColorHexValue();
-```
-
-#### isColorEqual
-
-Check if colors are equal.
-
-```javascript
-var isColorEqual = redoid.isColorEqual(a, b)
-```
-
-#### isTransitioning
-
-Returns `true` when currently inside transition.
-
-```javascript
-var isTransitioning = redoid.isTransitioning();
-```
+### API
 
 #### transition
 
@@ -224,6 +188,54 @@ Interrupt the current transition and clear the queue. When firing this method, n
 
 ```javascript
 redoid.stop();
+```
+
+#### getColor
+
+Return the current color. (e.g. `[255, 0, 0]`)
+
+```javascript
+var color = redoid.getColor();
+```
+
+#### getColorHexValue
+
+Return hex value of current color. (e.g. `#ff0000`)
+
+```javascript
+var color = redoid.getColorHexValue();
+```
+
+#### getLastQueuedColor
+
+Return the last queued color. If `loopTransition` is set to `true`, this value changes during transiton.
+
+```javascript
+var color = redoid.getLastQueuedColor();
+```
+
+#### getLastQueuedColorHexValue
+
+Return hex value of last queued color.
+
+```javascript
+var color = redoid.getLastQueuedColorHexValue();
+```
+
+#### isColorEqual
+
+Check if colors are equal.
+
+```javascript
+var isColorEqual = redoid.isColorEqual(a, b)
+```
+
+#### isTransitioning
+
+Returns `true` when currently inside transition.
+
+```javascript
+var isTransitioning = redoid.isTransitioning();
 ```
 
 #### setLoopTransition
