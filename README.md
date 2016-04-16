@@ -82,12 +82,12 @@ for (var easing in Redoid.easingFunctions)
 You can create one or more `Redoid` instances by calling its constructor. The constructor takes one optional associative array with following keys to configure the instance:
 
 - **color** – Initial color to apply when an instance gets created.
-- **colorComponentPins** – Array having 3 integer values of the RGB GPIO pins dioder is connected to.
+- **colorComponentPins** – Array holding 3 integer values of the RGB GPIO pins dioder is connected to.
 - **loopInterval** – Duration between transitioning ticks.
 - **defaultEasing** – Default easing
-- **idleTimeout** – Delay between idle state and the idle event.
-- **idleCallback** – Function that gets called when the idle event is triggered.
-- **idleColor** – Idle color to transition to when the idle event is triggered. This feature is disabled if set to `null`.
+- **idleTimeout** – Delay between the queue being idle and the idle event getting triggered.
+- **idleCallback** – Function that gets called when the idle event gets triggered.
+- **idleColor** – Idle color to transition to when the idle event gets triggered. This feature is disabled if set to `null`.
 - **idleColorTransitionDuration** – Idle color transition duration
 - **loopTransition** – If set to `true` completed transition steps will be added to the end of the queue resulting in a never-ending transition loop.
 

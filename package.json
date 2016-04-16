@@ -9,7 +9,7 @@
 		"url": "http://github.com/ffraenz/redoid.git"
 	},
 	"dependencies": {
-		"pi-blaster.js": "~0.1.2"
+		"pi-blaster.js": "0.1.*"
 	},
 	"homepage": "https://github.com/ffraenz/redoid",
 	"bugs": {
