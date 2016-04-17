@@ -83,6 +83,7 @@ You can create one or more `Redoid` instances by calling its constructor. The co
 
 - **color** – Initial color to apply when an instance gets created.
 - **colorComponentPins** – Array holding 3 integer values of the RGB GPIO pins dioder is connected to.
+- **applyColorCallback** – Custom function that replaces the default mechanism for applying colors. This feature is disabled if set to `null`.
 - **loopInterval** – Duration between transitioning ticks.
 - **defaultEasing** – Default easing
 - **idleTimeout** – Delay between the queue being idle and the idle event getting triggered.
@@ -99,6 +100,7 @@ var Redoid = require('redoid');
 var redoid = Redoid({
     color: '#ffffff',
     colorComponentPins: [4, 17, 18],
+    applyColorCallback: null,
     loopInterval: 25,
     defaultEasing: 'easeInOutQuad',
     idleTimeout: 0,
@@ -138,7 +140,6 @@ var easing = function(t) {
     return t<.5 ? 2*t*t : -1+(4-2*t)*t;
 }
 ```
-
 
 ### API
 
@@ -222,12 +223,20 @@ Return hex value of last queued color.
 var color = redoid.getLastQueuedColorHexValue();
 ```
 
+#### isColorValid
+
+Check if color is valid.
+
+```javascript
+var colorValid = redoid.isColorValid(color)
+```
+
 #### isColorEqual
 
 Check if colors are equal.
 
 ```javascript
-var isColorEqual = redoid.isColorEqual(a, b)
+var colorEqual = redoid.isColorEqual(a, b)
 ```
 
 #### isTransitioning
@@ -235,7 +244,7 @@ var isColorEqual = redoid.isColorEqual(a, b)
 Returns `true` when currently inside transition.
 
 ```javascript
-var isTransitioning = redoid.isTransitioning();
+var transitioning = redoid.isTransitioning();
 ```
 
 #### setLoopTransition
