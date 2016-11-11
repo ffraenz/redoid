@@ -1,17 +1,20 @@
 redoid
 ======
 
-A Node.js package that provides an API to control your IKEA Dioder LED light strip on your Raspberry Pi. Read *redoid* the other way round to understand where its name comes from.
+A Node.js package that provides an API to control your IKEA Dioder LED light strip from your Raspberry Pi. Read *redoid* the other way round to understand where its name comes from.
 
 ## Installation
 
 ### Connect Dioder to Raspberry Pi
 
-Please notice that you need to change the circuit board of your Dioder control unit physically in order to connect it to the Raspberry Pi. After that you will not be able to use the buttons on the control unit to change the behavior of the LEDs.
+Please notice that you need to apply physical changes to the circuit board of your Dioder control unit in order to connect it to the Raspberry Pi. After that you will no longer be able to use the buttons on the control unit to change the behavior of the LEDs.
 
-![Dioder control unit circuit board](https://cloud.githubusercontent.com/assets/1041468/14026264/59c19de4-f1f2-11e5-82ae-3eb507588dcc.jpg)
+Open the IKEA Dioder control unit carefully with a screwdriver. We are aware of following two versions of the circuit board inside it. Both are compatible with this modification.
 
-- Open the IKEA Dioder control unit carefully with a screwdriver.
+[![Dioder control unit circuit board](https://cloud.githubusercontent.com/assets/1041468/20233401/7ad2ad82-a86f-11e6-8494-324e583f27c9.jpg)](https://cloud.githubusercontent.com/assets/1041468/20233401/7ad2ad82-a86f-11e6-8494-324e583f27c9.jpg)
+
+Following modifications are necessary:
+
 - Remove the micro controller `1` from the circuit board.
 - Solder 4 wires to `2`, `R`, `G` and `B`.
 - Connect `2` to a `GND` pin on the Raspberry Pi.
@@ -24,8 +27,6 @@ Install the pi-blaster daemon ([instructions](https://github.com/sarfata/pi-blas
 Finally install `redoid` using npm:
 
     npm install redoid
-
-
 ## Examples
 
 ### Simple Alert
