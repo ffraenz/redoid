@@ -1,8 +1,11 @@
+
 # redoid
 
-[![npm](https://img.shields.io/npm/v/redoid.svg)](https://www.npmjs.com/package/redoid) [![npm](https://img.shields.io/npm/dm/redoid.svg)](https://www.npmjs.com/package/redoid) ![npm](https://img.shields.io/npm/l/express.svg)
+[![npm](https://img.shields.io/npm/v/redoid.svg)](https://www.npmjs.com/package/redoid)
+[![npm](https://img.shields.io/npm/dt/redoid.svg)](https://www.npmjs.com/package/redoid)
+[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
-A Node.js package that provides an API to control your IKEA Dioder LED light strip from your Raspberry Pi. Read *redoid* the other way round to understand where its name comes from.
+A Node.js package that provides an API to control your IKEA Dioder LED light strip from your Raspberry Pi. Read *redoid* the other way round to understand where its name came from.
 
 ## Installation
 

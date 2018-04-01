@@ -1,7 +1,7 @@
 {
 	"name": "redoid",
 	"description": "A Node.js package that provides an API to control your IKEA Dioder LED light strip on your Raspberry Pi.",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"author": "Fränz Friederes <fraenz@frieder.es>",
 	"license": "MIT",
 	"repository": {
